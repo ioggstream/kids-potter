@@ -21,7 +21,7 @@ while not has_enemy:
     else:
         print(has_enemy)
 
-post(f"http://{server}/start").json()
+post(f"http://{server}/restart").json()
 
 while True:
     spell = input("incantesimo: ")
