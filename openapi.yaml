@@ -5,6 +5,17 @@ info:
   contact:
     name: me
 paths:
+  /restart:
+    post:
+      description: restart game
+      operationId: app.post_restart
+      responses:
+        "200":
+           description: the user
+           content:
+             application/json:
+               schema: {}
+
   /user/{username}:
     post:
       description: create a new user

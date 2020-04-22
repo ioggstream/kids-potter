@@ -1,7 +1,10 @@
 import flask
 from time import time as now
-from random import randint
+from random import randint, choices
 from dataclasses import dataclass
+import logging
+
+log = logging.getLogger()
 
 
 @dataclass
@@ -10,23 +13,30 @@ class User:
     status: str = None
     last_spell: str = None
     ts: int = 0
-    points: int = 100
+    points: int = 500
 
 
-flask.g = {"users": {"harry": User(name="harry"), "draco": User(name="draco")}}
+flask.g = {"users": {}, "spells": {}}
 
-spells = {
+all_spells = {
     "expelliarmus": {"type": "defence", "score": 0, "risk": 0, "time": 2},
     "expecto patronum": {"type": "defence", "score": 0, "risk": 0, "time": 5},
-    "avada kedavra": {"type": "attack", "score": 25, "risk": 20},
-    "incendio": {"type": "attack", "score": 15, "risk": 30},
+    "avada kedavra": {"type": "attack", "score": 25, "risk": 20, "time": 0},
+    "incendio": {"type": "attack", "score": 15, "risk": 30, "time": 0},
     "petrificus": {"type": "attack", "score": 5, "risk": 0, "time": 3},
+    "wingardium leviosa": {"type": "attack", "score": 40, "risk": 20, "time": 5},
 }
 
 
 def restart():
+    spells = flask.g["spells"] = dict(choices(list(all_spells.items()), k=5))
+    log.warning("spells: %r", spells)
     for username in flask.g["users"]:
         flask.g["users"][username] = User(name=username)
+
+
+def post_restart():
+    restart()
 
 
 def get_user(username):
@@ -40,6 +50,7 @@ def post_user(username):
 
 
 def post_cast(body, user=None, enemy=None):
+    spells = flask.g["spells"]
 
     if enemy not in flask.g["users"]:
         return {"title": "nemico inesistente", "status": 404}
