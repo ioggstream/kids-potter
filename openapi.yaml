@@ -5,6 +5,39 @@ info:
   contact:
     name: me
 paths:
+  /user/{username}:
+    post:
+      description: create a new user
+      operationId: app.post_user
+      parameters:
+      - name: username
+        required: true
+        in: path
+        schema:
+           type: string
+      responses:
+        "200":
+           description: the user
+           content:
+             application/json:
+               schema: {}
+
+    get:
+      operationId: app.get_user
+      parameters:
+      - name: username
+        required: true
+        in: path
+        schema:
+           type: string
+      responses:
+        "200":
+           description: the user
+           content:
+             application/json:
+               schema: {}
+
+
   /cast/{user}/{enemy}:
     post:
       operationId: app.post_cast

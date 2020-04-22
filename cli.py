@@ -3,8 +3,10 @@ import json
 
 default_server = "localhost:5000"
 server = input(f"server [{default_server}]: ") or default_server
-user_name = input("come ti chiami? ") or "harry"
-enemy_name = input("Chi è il tuo enemy_name? ") or "draco"
+user_name = input("come ti chiami [harry]? ") or "harry"
+print(post(f"http://{server}/user/{user_name}").json())
+enemy_name = input("Chi è il tuo avversario [draco]? ") or "draco"
+print(post(f"http://{server}/user/{enemy_name}").json())
 
 while True:
   spell = input("incantesimo: ")
