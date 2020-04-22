@@ -1,0 +1,33 @@
+openapi: 3.0.1
+info:
+  title: potter
+  version: 1beta
+  contact:
+    name: me
+paths:
+  /cast/{user}/{enemy}:
+    post:
+      operationId: app.post_cast
+      parameters:
+      - name: user
+        required: true
+        in: path
+        schema:
+           type: string
+      - name: enemy
+        required: true
+        in: path
+        schema:
+          type: string
+      summary: casts a spell
+      x-body-name: body
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+      responses:
+        "200":
+           description: the server status
+           content:
+             application/json:
+               schema: {}
