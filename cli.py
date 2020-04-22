@@ -1,8 +1,14 @@
 from requests import post
 import json
 
-default_server = "localhost:5000"
-server = input(f"server [{default_server}]: ") or default_server
+from sys import argv
+
+try:
+  server = argv[1]
+except IndexError:
+  server = "localhost:5000"
+
+server = input(f"server [{server}]: ") or server
 user_name = input("come ti chiami [harry]? ") or "harry"
 print(post(f"http://{server}/user/{user_name}").json())
 enemy_name = input("Chi è il tuo avversario [draco]? ") or "draco"
