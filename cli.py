@@ -8,7 +8,7 @@ from threading import Thread
 
 
 DEFENCE_ICON = "🛡"
-ATTACK_ICON = "━━━☆"
+ATTACK_ICON = "━━━★"
 
 
 def iconize(s):
@@ -37,6 +37,7 @@ def play_music():
 
 
 def main(server):
+    print("\n\n\nPòno Pòtter\n\n\n")
     server = input(f"server [{server}]: ") or server
     user_name = input("come ti chiami [harry]? ") or "harry"
     user = post(f"http://{server}/user/{user_name}").json()

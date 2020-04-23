@@ -14,7 +14,7 @@ class User:
     status: str = None
     last_spell: str = None
     ts: int = 0
-    points: int = 500
+    points: int = 100
 
 
 flask.g = {"users": {}, "spells": {}}
