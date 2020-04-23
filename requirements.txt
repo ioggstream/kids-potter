@@ -1,0 +1,4 @@
+connexion
+pyyaml
+pytest
+pygame

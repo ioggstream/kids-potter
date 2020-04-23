@@ -2,10 +2,9 @@ from requests import post, get
 import json
 
 from sys import argv
-from requests import get
 from pathlib import Path
 from threading import Thread
-
+from time import sleep
 
 DEFENCE_ICON = "🛡"
 ATTACK_ICON = "━━━★"
@@ -21,6 +20,7 @@ def iconize(s):
 def play_music():
     try:
         from pygame import mixer
+        import pygame
 
         mixer.pre_init(44100, -16, 2, 2048)
         mixer.init()
@@ -32,14 +32,15 @@ def play_music():
             audio.write_bytes(r.content)
         mixer.music.load(audio.name)
         mixer.music.play(0)
-    except ImportError:
+    except (ImportError, pygame.error):
         pass
 
 
 def main(server):
-    print("\n\n\nPòno Pòtter\n\n\n")
-    server = input(f"server [{server}]: ") or server
-    user_name = input("come ti chiami [harry]? ") or "harry"
+    print("\n\n\nWelcome to Pòno Pòtter\n\n\n")
+    sleep(1)
+    server = input(f"Inserisci l'indirizzo del server [{server}]: ") or server
+    user_name = input("Come ti chiami [harry]? ") or "harry"
     user = post(f"http://{server}/user/{user_name}").json()
     print(user)
 
