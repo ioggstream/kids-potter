@@ -10,7 +10,8 @@ except IndexError:
 
 server = input(f"server [{server}]: ") or server
 user_name = input("come ti chiami [harry]? ") or "harry"
-print(post(f"http://{server}/user/{user_name}").json())
+user = post(f"http://{server}/user/{user_name}").json()
+print(user)
 
 has_enemy = None
 while not has_enemy:
@@ -22,9 +23,8 @@ while not has_enemy:
         print(has_enemy)
 
 post(f"http://{server}/restart").json()
-
 while True:
-    spell = input("incantesimo: ")
+    spell = input(f"{user_name} in {user['status']} lancia l'incantesimo: ")
     data = json.dumps({"s": spell}).encode()
     ret = post(
         f"http://{server}/cast/{user_name}/{enemy_name}",

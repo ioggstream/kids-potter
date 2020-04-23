@@ -20,7 +20,8 @@ class User:
 flask.g = {"users": {}, "spells": {}}
 
 all_spells = {
-    "testiamus": {"type": "attack", "score": 1, "risk": 0, "time": 0},
+    "ta": {"type": "attack", "score": 1, "risk": 0, "time": 0},
+    "td": {"type": "defence", "score": 1, "risk": 0, "time": 0},
     "expelliarmus": {"type": "defence", "score": 0, "risk": 0, "time": 2},
     "expecto patronum": {"type": "defence", "score": 0, "risk": 0, "time": 5},
     "avada kedavra": {"type": "attack", "score": 25, "risk": 20, "time": 0},
