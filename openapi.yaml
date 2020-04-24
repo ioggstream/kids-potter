@@ -5,16 +5,31 @@ info:
   contact:
     name: me
 paths:
+  /status:
+    get:
+      description: Return server stat
+      operationId: app.get_status
+      responses:
+        "200":
+          description: Server stats
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+
+
   /restart:
     post:
       description: restart game
       operationId: app.post_restart
       responses:
         "200":
-           description: the user
+           description: Server status
            content:
              application/json:
-               schema: {}
+               schema:
+                 $ref: '#/components/schemas/Status'
+
 
   /user/{username}:
     post:
@@ -31,7 +46,8 @@ paths:
            description: the user
            content:
              application/json:
-               schema: {}
+               schema:
+                 $ref: '#/components/schemas/User'
 
     get:
       operationId: app.get_user
@@ -46,7 +62,8 @@ paths:
            description: the user
            content:
              application/json:
-               schema: {}
+               schema:
+                 $ref: '#/components/schemas/User'
 
 
   /cast/{user}/{enemy}:
@@ -75,3 +92,29 @@ paths:
            content:
              application/json:
                schema: {}
+components:
+  schemas:
+    Status:
+      properties:
+        users:
+          type: array
+          items:
+            $ref: '#components/schemas/User'
+        spells:
+          type: object
+    User:
+      properties:
+        name:
+          type: string
+        status:
+          type: string
+        last_spell:
+          type: string
+        ts:
+          type: integer
+        points:
+          type: integer
+        level:
+          type: integer
+        stats:
+          type: object

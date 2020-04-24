@@ -1,0 +1,70 @@
+# This is a list of spells.
+# Fields explanation:
+# - risk: this spell is risky and can backfire
+# - type: attack or defence
+# - score: this spell removes `score` points
+# - level: TBD you can use this spell only after x level
+spells:
+- name: avada kedavra
+  description: >
+    Questo attacco ha il 20% di probabilità di ritorcersi
+    contro chi lo invoca.
+  risk: 20
+  score: 25
+  time: 0
+  type: attack
+- name: expecto patronum
+  description: >
+    Questo incantesimo protegge chi lo invoca fino al prossimo
+    incantesimo per un massimo di 10 secondi
+  risk: 0
+  score: 0
+  time: 10
+  type: defence
+- name: expelliarmus
+  description: >
+    Disarma per 5 secondi il proprio avversario.
+  risk: 0
+  score: 0
+  time: 5
+  type: defence
+- name: imperium
+  description: >
+    Per 3 secondi tutti gli incatesimi del proprio avversario
+    hanno il 50% di ritorcersi contro.
+  risk: -50
+  score: 0
+  time: 3
+  type: attack
+- name: incendio
+  description: >
+    Questo incantesimo lancia una fiamma ed ha il 30% di possibilità di autoinfliggere il danno.
+  risk: 30
+  score: 15
+  time: 0
+  type: attack
+- name: petrificus
+  description: >
+    l'avversario viene pietrificato: ha 5 punti danno e non può attaccare per 3 secondi
+  risk: 0
+  score: 5
+  time: 3
+  type: attack
+- name: wingardium leviosa
+  description: >
+    libra in aria l'avversario per 7 secondi e poi lo scaglia a terra. Finché è in
+    aria non può attaccare. C'è il 20% di possibilità che ti si ritorca contro.
+  risk: 20
+  score: 15
+  time: 7
+  type: attack
+- name: ta
+  risk: 0
+  score: 0
+  time: 0
+  type: attack
+- name: td
+  risk: 0
+  score: 0
+  time: 0
+  type: defence

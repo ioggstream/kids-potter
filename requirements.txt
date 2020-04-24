@@ -2,3 +2,7 @@ connexion
 pyyaml
 pytest
 pygame
+flask_testing
+editdistance
+phonetics
+click
