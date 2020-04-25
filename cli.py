@@ -55,13 +55,6 @@ def _input_server(default_server):
     return url
 
 
-def _input_user(url):
-    user_name = input("Come ti chiami [harry]? ") or "harry"
-    user = post(f"{url}/user/{user_name}").json()
-    print(user)
-    return user
-
-
 def _input_enemy(url):
     has_enemy = None
     while not has_enemy:
@@ -92,25 +85,25 @@ import click
 @click.option('--server', default="http://localhost:5000", help='Server address.')
 @click.option('--music/--no-music', default=True,
               help='Play background music.')
-def main(server, music):
+@click.option('--player', prompt='Come ti chiami?', default="harry")
+@click.option('--computer', prompt='Giocatore computer?', default=False)
+def main(server, music, player, computer):
     t = Thread(target=play_music)
     if music:
         t.start()
-    game(server)
+    game(server, player, not computer)
     if music:
         t.join()
 
 
-def game(server):
+def game(server, player, human):
     print("\n\n\nWelcome to Pòno Pòtter\n\n\n")
     sleep(1)
 
     url = _input_server(server)
-    user = _input_user(url)
+    user = post(f"{url}/user/{player}").json()
     user_name = user["name"]
     enemy_name = _input_enemy(url)
-    human = input("human? ") or False
-
     server_status = post(f"{url}/restart").json()["status"]
     all_spells = list(server_status["spells"].keys())
 
