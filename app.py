@@ -10,7 +10,10 @@ from pathlib import Path
 import json, dataclasses
 import editdistance
 
+logging.basicConfig(filename="server.log", level=logging.DEBUG)
 log = logging.getLogger()
+
+HANDICAP_USERS = ("python",)
 
 
 class DataclassJSONEncoder(json.JSONEncoder):
@@ -18,6 +21,9 @@ class DataclassJSONEncoder(json.JSONEncoder):
         if dataclasses.is_dataclass(o):
             return dataclasses.asdict(o)
         return super().default(o)
+
+
+from flask import current_app as app
 
 
 @dataclass
@@ -31,7 +37,10 @@ class User:
     stats: dict = None
 
     def __post_init__(self):
-        self.stats = {"spells": {"errors": 0}}
+        self.stats = {"spells": {"errors": 0, "typespeed": {"last": 0, "average": 0}}}
+        if self.name in HANDICAP_USERS:
+            self.level = -1
+            self.points = 50
 
 
 @dataclass
@@ -42,6 +51,8 @@ class Spell:
     risk: int
     time: int
     description: str = None
+    level: int = 0
+    on_insufficient_level: str = "Non hai ancora imparato questo incantesimo!"
 
 
 flask.g = {"users": {"a": User(name="a"), "b": User(name="b")}, "spells": {}}
@@ -54,11 +65,8 @@ def load_spells():
     }
 
 
-all_spells = load_spells()
-
-
 def restart(reduced_spells=False):
-    flask.g["spells"] = all_spells  # ict(choices(list(all_spells.items()), k=5))
+    flask.g["spells"] = load_spells()  # ict(choices(list(all_spells.items()), k=5))
     for username in flask.g["users"]:
         flask.g["users"][username] = User(name=username)
     log.warning("status: %r", flask.g)
@@ -103,14 +111,25 @@ def backfires(my_spell, enemy_spell):
 
 
 def _update_stats(user_u, spell):
+    q = 0.92
     # update stats
     if spell not in flask.g["spells"]:
         user_u.stats["spells"]["errors"] += 1
         return
 
-    if spell not in user_u.stats["spells"]:
-        user_u.stats["spells"][spell] = 1
-    user_u.stats["spells"][spell] += 1
+    spell_stats = user_u.stats["spells"]
+    if spell not in spell_stats:
+        spell_stats[spell] = 1
+    spell_stats[spell] += 1
+    spell_stats["typespeed"]["last"] = current_typespeed = (
+        int(now() - user_u.ts) if user_u.ts else 0
+    )
+
+    spell_stats["typespeed"]["average"] = int(
+        q * spell_stats["typespeed"]["average"] + (1 - q) * current_typespeed
+        if spell_stats["typespeed"]["average"]
+        else current_typespeed
+    )
 
 
 SPELL_OK, SPELL_KO, SPELL_MISSING = range(3)
@@ -145,7 +164,6 @@ def post_cast(body, user=None, enemy=None):
 
     enemy_u = flask.g["users"].get(enemy)
     user_u = flask.g["users"].get(user)
-
     if enemy_u is None:
         return problem(title="Not Found", detail="nemico inesistente", status=404)
 
@@ -157,6 +175,7 @@ def post_cast(body, user=None, enemy=None):
         return {"game": flask.g, "data": body, "user": user, "title": msg}
 
     spell = body.get("s", None)
+    log.warning(f"{user}, {enemy}, {spell}")
     _update_stats(user_u, spell)
 
     spell, misspelt = _misspelt(spell, spells)
@@ -177,6 +196,11 @@ def post_cast(body, user=None, enemy=None):
     my_spell = spells[spell]
     enemy_spell = spells.get(enemy_u.last_spell, None)
 
+    # Check spell level.
+    if 0 <= user_u.level < my_spell.level:
+        msg = f"{my_spell.on_insufficient_level}"
+        return {"game": flask.g, "data": body, "user": user, "title": msg}
+
     # Expire the enemy spell.
     if now() - enemy_u.ts > enemy_spell.time if enemy_spell else 0:
         enemy_spell = None
@@ -193,7 +217,7 @@ def post_cast(body, user=None, enemy=None):
     # The spell backfires if misspelt or because of risk
     if misspelt == SPELL_KO or backfires(my_spell, enemy_spell):
         user_u.points -= my_spell.score
-        msg = f"L'incantesimo \"{spell}\" ti si è ritorto contro! Che sfortuna!"
+        msg = f'L\'incantesimo "{spell}" ti si è ritorto contro! Che sfortuna!'
         return {"game": flask.g, "data": body, "user": user, "title": msg}
 
     if enemy_u.status is "defence" and enemy_spell:
@@ -204,7 +228,17 @@ def post_cast(body, user=None, enemy=None):
         msg = f"{enemy} ti ha ancora bloccato"
         return {"game": flask.g, "data": body, "user": user, "title": msg}
 
-    enemy_u.points -= my_spell.score
+    # Consider handicap
+    handicap_factor = 1
+    if user_u.level < 0 and enemy_u.stats["spells"]["typespeed"]["average"]:
+        handicap_factor = (
+            user_u.stats["spells"]["typespeed"]["average"]
+            / enemy_u.stats["spells"]["typespeed"]["average"]
+        )
+        log.warning("Reducing spell attack of %r", handicap_factor)
+    else:
+        user_u.level += bool(my_spell.score)
+    enemy_u.points -= int(my_spell.score * min(handicap_factor, 1))
 
     if enemy_u.points <= 0:
         msg = "Hai vinto!"

@@ -8,8 +8,11 @@ from pathlib import Path
 from threading import Thread
 from time import sleep
 
-DEFENCE_ICON = "🛡"
+DEFENCE_ICON = "\U0001f6e1"
+CLOCK_ICON = "\U000023F1"
 ATTACK_ICON = "━━━★"
+ERROR_ICON = "\U0000274C"
+KEYBOARD_ICON = "\U00002328"
 
 
 def iconize(s):
@@ -78,15 +81,15 @@ def _command(url, spell):
 
     return True
 
+
 import click
 
 
 @click.command()
-@click.option('--server', default="http://localhost:5000", help='Server address.')
-@click.option('--music/--no-music', default=True,
-              help='Play background music.')
-@click.option('--player', prompt='Come ti chiami?', default="harry")
-@click.option('--computer', prompt='Giocatore computer?', default=False)
+@click.option("--server", default="http://localhost:5000", help="Server address.")
+@click.option("--music/--no-music", default=True, help="Play background music.")
+@click.option("--player", prompt="Come ti chiami?", default="harry")
+@click.option("--computer", default=False)
 def main(server, music, player, computer):
     t = Thread(target=play_music)
     if music:
@@ -110,8 +113,19 @@ def game(server, player, human):
     while True:
         # Read spell
         if human:
+            if user["level"] == "0":
+                print(
+                    "Sei ancora al primo anno della scuola di magia, Puoi usare solo gli incantesimi del primo anno!"
+                )
             spell = input(
-                iconize(f"{user_name} {user['status']} lancia l'incantesimo: ")
+                iconize(
+                    f"{user_name} {user['status']} "
+                    f" {user['stats']['spells']['errors']}{ERROR_ICON}"
+                    f" {user['stats']['spells']['typespeed']['average']}{CLOCK_ICON}"
+                    f" {user['stats']['spells']['typespeed']['last']}{KEYBOARD_ICON}"
+                    f" {user['level']}"
+                    f" lancia l'incantesimo: "
+                )
             )
 
             if _command(url, spell):
@@ -139,5 +153,6 @@ def game(server, player, human):
         except:
             print(status)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

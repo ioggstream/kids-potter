@@ -5,37 +5,7 @@
 # - score: this spell removes `score` points
 # - level: TBD you can use this spell only after x level
 spells:
-- name: avada kedavra
-  description: >
-    Questo attacco ha il 20% di probabilità di ritorcersi
-    contro chi lo invoca.
-  risk: 20
-  score: 25
-  time: 0
-  type: attack
-- name: expecto patronum
-  description: >
-    Questo incantesimo protegge chi lo invoca fino al prossimo
-    incantesimo per un massimo di 10 secondi
-  risk: 0
-  score: 0
-  time: 10
-  type: defence
-- name: expelliarmus
-  description: >
-    Disarma per 5 secondi il proprio avversario.
-  risk: 0
-  score: 0
-  time: 5
-  type: defence
-- name: imperium
-  description: >
-    Per 3 secondi tutti gli incatesimi del proprio avversario
-    hanno il 50% di ritorcersi contro.
-  risk: -50
-  score: 0
-  time: 3
-  type: attack
+# First year
 - name: incendio
   description: >
     Questo incantesimo lancia una fiamma ed ha il 30% di possibilità di autoinfliggere il danno.
@@ -50,6 +20,13 @@ spells:
   score: 5
   time: 3
   type: attack
+- name: locomotor mortis
+  description: >
+    L'avversario è bloccato per 8 secondi
+  risk: 0
+  score: 0
+  time: 8
+  type: defence
 - name: wingardium leviosa
   description: >
     libra in aria l'avversario per 7 secondi e poi lo scaglia a terra. Finché è in
@@ -58,6 +35,52 @@ spells:
   score: 15
   time: 7
   type: attack
+- name: expecto patronum
+  description: >
+    Questo incantesimo protegge chi lo invoca fino al prossimo
+    incantesimo per un massimo di 10 secondi
+  risk: 0
+  score: 0
+  time: 10
+  type: defence
+  level: 5
+- name: expelliarmus
+  description: >
+    Disarma per 5 secondi il proprio avversario.
+  risk: 0
+  score: 0
+  time: 5
+  type: defence
+  level: 2
+# curses
+- name: crucius
+  description: >
+    Il nemico soffre per 20 secondi.
+  risk:
+  score: 10
+  time: 10
+  type: attack
+  level: 5
+- name: imperium
+  description: >
+    Per 3 secondi tutti gli incatesimi del proprio avversario
+    hanno il 50% di ritorcersi contro.
+  risk: -50
+  score: 0
+  time: 3
+  type: attack
+  level: 10
+- name: avada kedavra
+  description: >
+    Questo attacco ha il 20% di probabilità di ritorcersi
+    contro chi lo invoca. Per invocarlo devi essere di livello 15.
+  risk: 20
+  score: 25
+  time: 0
+  type: attack
+  on_insufficient_level: "L'incantesimo non ha funzionato...devi volerlo veramente!"
+  level: 15
+
 - name: ta
   risk: 0
   score: 0
@@ -68,3 +91,13 @@ spells:
   score: 0
   time: 0
   type: defence
+# Bombarda
+#Brackium Emendo
+  #Legilimens
+# Confundo
+# Crucio
+# Levicorpus - Liberacorpus
+# Prior Incantato
+# Protego
+# Sectumsempra
+# stupeficium
