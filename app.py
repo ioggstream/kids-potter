@@ -46,13 +46,14 @@ class User:
 @dataclass
 class Spell:
     name: str
-    score: int
     type: str
-    risk: int
-    time: int
+    score: int = 0
+    time: int = 0
+    risk: int = 0
     description: str = None
     level: int = 0
     on_insufficient_level: str = "Non hai ancora imparato questo incantesimo!"
+    score_level: int = 0
 
 
 flask.g = {"users": {"a": User(name="a"), "b": User(name="b")}, "spells": {}}
@@ -146,7 +147,8 @@ def _misspelt(spell, spells):
     from phonetics import metaphone
     from editdistance import eval as edit_distance
 
-    log.warning("Looking for %r in %r", spell, spells)
+    assert spell
+    log.debug("Looking for %r in %r", spell, spells)
     if spell in spells:
         return (spell, SPELL_OK)
 
@@ -202,6 +204,7 @@ def post_cast(body, user=None, enemy=None):
         return {"game": flask.g, "data": body, "user": user, "title": msg}
 
     # Expire the enemy spell.
+    log.warning("Enemy spell: %r cast %r", enemy_spell, now() - enemy_u.ts)
     if now() - enemy_u.ts > enemy_spell.time if enemy_spell else 0:
         enemy_spell = None
 
@@ -220,11 +223,12 @@ def post_cast(body, user=None, enemy=None):
         msg = f'L\'incantesimo "{spell}" ti si è ritorto contro! Che sfortuna!'
         return {"game": flask.g, "data": body, "user": user, "title": msg}
 
-    if enemy_u.status is "defence" and enemy_spell:
+    log.warning("Enemy status %r, spell %r", enemy_u.status, enemy_spell)
+    if enemy_u.status == "defence" and enemy_spell:
         msg = f"{enemy} ha parato il tuo incantesimo"
         return {"game": flask.g, "data": body, "user": user, "title": msg}
 
-    if enemy_u.status is "attack" and enemy_spell:
+    if enemy_u.status == "attack" and enemy_spell:
         msg = f"{enemy} ti ha ancora bloccato"
         return {"game": flask.g, "data": body, "user": user, "title": msg}
 
@@ -238,7 +242,9 @@ def post_cast(body, user=None, enemy=None):
         log.warning("Reducing spell attack of %r", handicap_factor)
     else:
         user_u.level += bool(my_spell.score)
-    enemy_u.points -= int(my_spell.score * min(handicap_factor, 1))
+
+    damage = my_spell.score + user_u.level * my_spell.score_level
+    enemy_u.points -= int(damage * min(handicap_factor, 1))
 
     if enemy_u.points <= 0:
         msg = "Hai vinto!"

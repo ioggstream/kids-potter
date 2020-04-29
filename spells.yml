@@ -10,7 +10,8 @@ spells:
   description: >
     Questo incantesimo lancia una fiamma ed ha il 30% di possibilità di autoinfliggere il danno.
   risk: 30
-  score: 15
+  score: 5
+  score_level: 1
   time: 0
   type: attack
 - name: petrificus
@@ -32,7 +33,8 @@ spells:
     libra in aria l'avversario per 7 secondi e poi lo scaglia a terra. Finché è in
     aria non può attaccare. C'è il 20% di possibilità che ti si ritorca contro.
   risk: 20
-  score: 15
+  score: 5
+  score_level: 2
   time: 7
   type: attack
 - name: expecto patronum
