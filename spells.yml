@@ -16,7 +16,7 @@ spells:
   type: attack
 - name: petrificus
   description: >
-    l'avversario viene pietrificato: ha 5 punti danno e non può attaccare per 3 secondi
+    l'avversario viene pietrificato: non può attaccare e riceve un danno.
   risk: 0
   score: 5
   time: 3
@@ -33,7 +33,7 @@ spells:
     libra in aria l'avversario per 7 secondi e poi lo scaglia a terra. Finché è in
     aria non può attaccare. C'è il 20% di possibilità che ti si ritorca contro.
   risk: 20
-  score: 5
+  score: 2
   score_level: 2
   time: 7
   type: attack
@@ -45,7 +45,7 @@ spells:
   score: 0
   time: 10
   type: defence
-  level: 5
+  level: 2
 - name: expelliarmus
   description: >
     Disarma per 5 secondi il proprio avversario.
@@ -54,15 +54,29 @@ spells:
   time: 5
   type: defence
   level: 2
+- name: vulnera sanentur
+  description: >-
+    Questo incantesimo guarisce le ferite.
+  score: 0
+  score_self: -10
+  type: defence
+  level: 2
+- name: bombarda
+  description: >-
+    Questo incantesimo colpisce sia il nemico che il giocatore.
+  score: 8
+  score_self: 4
+  type: attack
+  level: 3
 # curses
 - name: crucius
   description: >
     Il nemico soffre per 20 secondi.
-  risk:
+  risk: 0
   score: 10
   time: 10
   type: attack
-  level: 5
+  level: 4
 - name: imperium
   description: >
     Per 3 secondi tutti gli incatesimi del proprio avversario
@@ -71,7 +85,7 @@ spells:
   score: 0
   time: 3
   type: attack
-  level: 10
+  level: 4
 - name: avada kedavra
   description: >
     Questo attacco ha il 20% di probabilità di ritorcersi
@@ -81,7 +95,7 @@ spells:
   time: 0
   type: attack
   on_insufficient_level: "L'incantesimo non ha funzionato...devi volerlo veramente!"
-  level: 15
+  level: 4
 
 - name: ta
   risk: 0
@@ -93,11 +107,9 @@ spells:
   score: 0
   time: 0
   type: defence
-# Bombarda
 #Brackium Emendo
-  #Legilimens
+#Legilimens
 # Confundo
-# Crucio
 # Levicorpus - Liberacorpus
 # Prior Incantato
 # Protego

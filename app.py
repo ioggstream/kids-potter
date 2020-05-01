@@ -34,6 +34,7 @@ class User:
     ts: int = 0
     points: int = 100
     level: int = 0
+    power: int = 0
     stats: dict = None
 
     def __post_init__(self):
@@ -54,6 +55,7 @@ class Spell:
     level: int = 0
     on_insufficient_level: str = "Non hai ancora imparato questo incantesimo!"
     score_level: int = 0
+    score_self: int = 0
 
 
 flask.g = {"users": {"a": User(name="a"), "b": User(name="b")}, "spells": {}}
@@ -105,6 +107,7 @@ def backfires(my_spell, enemy_spell):
     if enemy_spell.risk >= 0:
         return False
 
+    # Spell with a risk < 0 are curses.
     if randint(0, 100) < -enemy_spell.risk:
         return True
 
@@ -174,7 +177,13 @@ def post_cast(body, user=None, enemy=None):
 
     if user_u.points <= 0:
         msg = "Hai perso :("
-        return {"game": flask.g, "data": body, "user": user, "title": msg}
+        return {
+            "game": flask.g,
+            "data": body,
+            "user": user,
+            "title": msg,
+            "type": "https://ioggstream.github.com/kids-potter/you-lost",
+        }
 
     spell = body.get("s", None)
     log.warning(f"{user}, {enemy}, {spell}")
@@ -216,6 +225,7 @@ def post_cast(body, user=None, enemy=None):
     if misspelt == SPELL_OK:
         user_u.ts = now()
         user_u.status = my_spell.type
+        user_u.power += len(my_spell.name)
 
     # The spell backfires if misspelt or because of risk
     if misspelt == SPELL_KO or backfires(my_spell, enemy_spell):
@@ -245,10 +255,17 @@ def post_cast(body, user=None, enemy=None):
 
     damage = my_spell.score + user_u.level * my_spell.score_level
     enemy_u.points -= int(damage * min(handicap_factor, 1))
+    user_u.points -= my_spell.score_self
 
     if enemy_u.points <= 0:
         msg = "Hai vinto!"
-        return {"game": flask.g, "data": body, "user": user, "title": msg}
+        return {
+            "game": flask.g,
+            "data": body,
+            "user": user,
+            "title": msg,
+            "type": "https://ioggstream.github.com/kids-potter/you-won",
+        }
 
     if my_spell.type == "defence":
         msg = "Difesa riuscita!"

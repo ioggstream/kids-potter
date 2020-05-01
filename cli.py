@@ -13,6 +13,9 @@ CLOCK_ICON = "\U000023F1"
 ATTACK_ICON = "━━━★"
 ERROR_ICON = "\U0000274C"
 KEYBOARD_ICON = "\U00002328"
+LIGHTNING_ICON = "\U000026A2"
+FIRE_ICON = "\U0000E11D"
+MAGE_ICON = "\U0001F9D9"
 
 
 def iconize(s):
@@ -72,10 +75,10 @@ def _input_enemy(url):
 
 def _command(url, spell):
     if spell.startswith("/"):
-        print(get(f"{url}/{spell}").content)
+        print(get(f"{url}/{spell}").content.decode())
     elif spell.startswith("+/"):
         spell = spell[1:]
-        print(post(f"{url}/{spell}").content)
+        print(post(f"{url}/{spell}").content.decode())
     else:
         return False
 
@@ -88,7 +91,12 @@ import click
 @click.command()
 @click.option("--server", default="http://localhost:5000", help="Server address.")
 @click.option("--music/--no-music", default=True, help="Play background music.")
-@click.option("--player", prompt="Come ti chiami?", default="harry")
+@click.option(
+    "--player",
+    prompt="Come ti chiami?",
+    default="harry",
+    help="Il nome del tuo giocatore.s",
+)
 @click.option("--computer", default=False)
 def main(server, music, player, computer):
     t = Thread(target=play_music)
@@ -111,30 +119,34 @@ def game(server, player, human):
     all_spells = list(server_status["spells"].keys())
 
     while True:
+        if user["level"] == "0":
+            print(
+                "Sei ancora al primo anno della scuola di magia, Puoi usare solo gli incantesimi del primo anno!"
+            )
+        print(
+            iconize(
+                f"{user_name} {user['status']} {MAGE_ICON}"
+                f" {user['stats']['spells']['errors']}{ERROR_ICON}"
+                f" {user['stats']['spells']['typespeed']['average']}{CLOCK_ICON}"
+                f" {user['stats']['spells']['typespeed']['last']}{KEYBOARD_ICON}"
+                f" {user['level']}{FIRE_ICON}"
+                f" {user['power']}{LIGHTNING_ICON}"
+                f" lancia l'incantesimo: "
+            ),
+            end="",
+        )
+
         # Read spell
         if human:
-            if user["level"] == "0":
-                print(
-                    "Sei ancora al primo anno della scuola di magia, Puoi usare solo gli incantesimi del primo anno!"
-                )
-            spell = input(
-                iconize(
-                    f"{user_name} {user['status']} "
-                    f" {user['stats']['spells']['errors']}{ERROR_ICON}"
-                    f" {user['stats']['spells']['typespeed']['average']}{CLOCK_ICON}"
-                    f" {user['stats']['spells']['typespeed']['last']}{KEYBOARD_ICON}"
-                    f" {user['level']}"
-                    f" lancia l'incantesimo: "
-                )
-            )
 
+            spell = input()
             if _command(url, spell):
                 continue
         else:
             seconds_to_wait = randint(1, 3)
             sleep(seconds_to_wait)
             spell = choice(all_spells)
-
+            print(spell)
         # send spell
         data = json.dumps({"s": spell}).encode()
         ret = post(
@@ -151,7 +163,7 @@ def game(server, player, human):
             f_msg = f"{user_name}: {user['points']}, {enemy_name}: {enemy['points']}\n{{title}}"
             print(f_msg.format(**status))
         except:
-            print(status)
+            print(status.decode())
 
 
 if __name__ == "__main__":
