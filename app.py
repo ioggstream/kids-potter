@@ -56,6 +56,7 @@ class Spell:
     on_insufficient_level: str = "Non hai ancora imparato questo incantesimo!"
     score_level: int = 0
     score_self: int = 0
+    msg: str = None
 
 
 flask.g = {"users": {"a": User(name="a"), "b": User(name="b")}, "spells": {}}
@@ -266,9 +267,13 @@ def post_cast(body, user=None, enemy=None):
             "title": msg,
             "type": "https://ioggstream.github.com/kids-potter/you-won",
         }
+    from jinja2 import Template
 
     if my_spell.type == "defence":
         msg = "Difesa riuscita!"
+    elif my_spell.msg:
+        t = Template(my_spell.msg)
+        msg = t.render(game=flask.g)
     else:
         msg = "Bravo! L'hai colpito!"
     return {"game": flask.g, "data": body, "user": user, "title": msg}

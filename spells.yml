@@ -96,7 +96,13 @@ spells:
   type: attack
   on_insufficient_level: "L'incantesimo non ha funzionato...devi volerlo veramente!"
   level: 4
-
+- name: legilimens
+  risk: 0
+  score: 0
+  type: attack
+  time: 0  # ["spells"].keys()
+  msg: >-
+    {{game["spells"].keys()}}
 - name: ta
   risk: 0
   score: 0

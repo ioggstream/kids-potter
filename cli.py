@@ -163,7 +163,10 @@ def game(server, player, human):
             f_msg = f"{user_name}: {user['points']}, {enemy_name}: {enemy['points']}\n{{title}}"
             print(f_msg.format(**status))
         except:
-            print(status.decode())
+            try:
+                print(status.decode())
+            except:
+                print(status)
 
 
 if __name__ == "__main__":
