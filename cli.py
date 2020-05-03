@@ -167,7 +167,7 @@ def game(server, player, human):
             users = status["game"]["users"]
             user = users[user_name]
             enemy = users[enemy_name]
-            f_msg = f"{user_name}: {user['points']}, {enemy_name}: {enemy['points']}\n{{title}}"
+            f_msg = f"{user_name}: {user['life_points']}, {enemy_name}: {enemy['life_points']}\n{{title}}"
             if "title" not in status:
                 status["title"] = ""
             print(f_msg.format(**status))

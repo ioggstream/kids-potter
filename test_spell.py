@@ -102,11 +102,11 @@ class TestPublicController(BaseTestCase):
         testlist = [
             [
                 ("harry", "draco", "locomotor mortis"),
-                ('{{game["users"]["harry"]["points"]}}', "100"),
+                ('{{game["users"]["harry"]["life_points"]}}', "100"),
             ],
             [
                 ("draco", "harry", "petrificus"),
-                ('{{game["users"]["harry"]["points"]}}', "100"),
+                ('{{game["users"]["harry"]["life_points"]}}', "100"),
             ],
         ]
         for test, (template, expected) in testlist:
@@ -117,15 +117,15 @@ class TestPublicController(BaseTestCase):
         testlist = [
             [
                 ("harry", "draco", "locomotor mortis"),
-                ('{{game["users"]["harry"]["points"]}}', "100"),
+                ('{{game["users"]["harry"]["life_points"]}}', "100"),
             ],
             [
                 ("draco", "harry", "finite incantatem"),
-                ('{{game["users"]["harry"]["points"]}}', "100"),
+                ('{{game["users"]["harry"]["life_points"]}}', "100"),
             ],
             [
                 ("draco", "harry", "petrificus"),
-                ('{{game["users"]["harry"]["points"]}}', "95"),
+                ('{{game["users"]["harry"]["life_points"]}}', "95"),
             ],
         ]
         for test, (template, expected) in testlist:

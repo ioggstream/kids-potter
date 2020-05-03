@@ -34,7 +34,7 @@ class User:
     last_spell: str = None
     last_spell_active: bool = False
     ts: int = 0
-    points: int = 100
+    life_points: int = 100
     level: int = 0
     power: int = 0
     stats: dict = None
@@ -43,7 +43,7 @@ class User:
         self.stats = {"spells": {"errors": 0, "typespeed": {"last": 0, "average": 0}}}
         if self.name in HANDICAP_USERS:
             self.level = -1
-            self.points = 50
+            self.life_points = 50
 
 
 @dataclass
@@ -179,7 +179,7 @@ def post_cast(body, user=None, enemy=None):
     if user_u is None:
         return problem(title="Not Found", detail="giocatore inesistente", status=404)
 
-    if user_u.points <= 0:
+    if user_u.life_points <= 0:
         msg = "Hai perso :("
         return {
             "game": flask.g,
@@ -238,7 +238,7 @@ def post_cast(body, user=None, enemy=None):
     damage = my_spell.score + user_u.level * my_spell.score_level
     # The spell backfires if misspelt or because of risk
     if misspelt == SPELL_KO or backfires(my_spell, enemy_spell):
-        user_u.points -= damage
+        user_u.life_points -= damage
         msg = f'L\'incantesimo "{spell}" ti si è ritorto contro! Che sfortuna!'
         return {"game": flask.g, "data": body, "user": user, "title": msg}
 
@@ -262,10 +262,10 @@ def post_cast(body, user=None, enemy=None):
     else:
         user_u.level += bool(my_spell.score)
 
-    enemy_u.points -= int(damage * min(handicap_factor, 1))
-    user_u.points -= my_spell.score_self
+    enemy_u.life_points -= int(damage * min(handicap_factor, 1))
+    user_u.life_points -= my_spell.score_self
 
-    if enemy_u.points <= 0:
+    if enemy_u.life_points <= 0:
         msg = "Hai vinto!"
         return {
             "game": flask.g,
