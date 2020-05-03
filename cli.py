@@ -3,10 +3,13 @@ from random import randint, choice
 from requests import post, get, exceptions
 import json
 
-from sys import argv
 from pathlib import Path
 from threading import Thread
 from time import sleep
+import logging
+
+log = logging.getLogger()
+logging.basicConfig(level=logging.DEBUG)
 
 DEFENCE_ICON = "\U0001f6e1"
 CLOCK_ICON = "\U000023F1"
@@ -115,7 +118,7 @@ def game(server, player, human):
     user = post(f"{url}/user/{player}").json()
     user_name = user["name"]
     enemy_name = _input_enemy(url)
-    server_status = post(f"{url}/restart").json()["status"]
+    server_status = post(f"{url}/restart").json()["game"]
     all_spells = list(server_status["spells"].keys())
 
     while True:
@@ -148,12 +151,16 @@ def game(server, player, human):
             spell = choice(all_spells)
             print(spell)
         # send spell
-        data = json.dumps({"s": spell}).encode()
-        ret = post(
-            f"{url}/cast/{user_name}/{enemy_name}",
-            data=data,
-            headers={"content-type": "application/json"},
-        )
+        if spell:
+            data = json.dumps({"s": spell}).encode()
+            ret = post(
+                f"{url}/cast/{user_name}/{enemy_name}",
+                data=data,
+                headers={"content-type": "application/json"},
+            )
+        else:
+            ret = get(f"{url}/status")
+
         status = ret.json()
 
         try:
@@ -161,12 +168,12 @@ def game(server, player, human):
             user = users[user_name]
             enemy = users[enemy_name]
             f_msg = f"{user_name}: {user['points']}, {enemy_name}: {enemy['points']}\n{{title}}"
+            if "title" not in status:
+                status["title"] = ""
             print(f_msg.format(**status))
-        except:
-            try:
-                print(status.decode())
-            except:
-                print(status)
+        except Exception as e:
+            print(status.decode())
+            log.exception("Errore")
 
 
 if __name__ == "__main__":

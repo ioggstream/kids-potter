@@ -9,6 +9,7 @@ from connexion import problem
 from pathlib import Path
 import json, dataclasses
 import editdistance
+from jinja2 import Template
 
 logging.basicConfig(filename="server.log", level=logging.DEBUG)
 log = logging.getLogger()
@@ -31,6 +32,7 @@ class User:
     name: str
     status: str = None
     last_spell: str = None
+    last_spell_active: bool = False
     ts: int = 0
     points: int = 100
     level: int = 0
@@ -50,6 +52,7 @@ class Spell:
     type: str
     score: int = 0
     time: int = 0
+    reset_spell: bool = False
     risk: int = 0
     description: str = None
     level: int = 0
@@ -74,11 +77,11 @@ def restart(reduced_spells=False):
     for username in flask.g["users"]:
         flask.g["users"][username] = User(name=username)
     log.warning("status: %r", flask.g)
-    return {"status": flask.g}
+    return {"game": flask.g}
 
 
 def get_status():
-    return {"status": flask.g}
+    return {"game": flask.g}
 
 
 def post_restart():
@@ -152,7 +155,7 @@ def _misspelt(spell, spells):
     from editdistance import eval as edit_distance
 
     assert spell
-    log.debug("Looking for %r in %r", spell, spells)
+    # log.debug("Looking for %r in %r", spell, spells)
     if spell in spells:
         return (spell, SPELL_OK)
 
@@ -206,7 +209,7 @@ def post_cast(body, user=None, enemy=None):
 
     # get active spells
     my_spell = spells[spell]
-    enemy_spell = spells.get(enemy_u.last_spell, None)
+    enemy_spell = spells.get(enemy_u.last_spell) if enemy_u.last_spell_active else None
 
     # Check spell level.
     if 0 <= user_u.level < my_spell.level:
@@ -222,15 +225,20 @@ def post_cast(body, user=None, enemy=None):
     # If you misspell a spell, you can't retry it
     # as it will be your active spell.
     user_u.last_spell = spell
+    user_u.last_spell_active = True
     # If the spell is correct, update timestamp and status.
     if misspelt == SPELL_OK:
         user_u.ts = now()
         user_u.status = my_spell.type
         user_u.power += len(my_spell.name)
+        if my_spell.reset_spell:
+            enemy_u.last_spell_active = False
+            enemy_spell = None
 
+    damage = my_spell.score + user_u.level * my_spell.score_level
     # The spell backfires if misspelt or because of risk
     if misspelt == SPELL_KO or backfires(my_spell, enemy_spell):
-        user_u.points -= my_spell.score
+        user_u.points -= damage
         msg = f'L\'incantesimo "{spell}" ti si è ritorto contro! Che sfortuna!'
         return {"game": flask.g, "data": body, "user": user, "title": msg}
 
@@ -254,7 +262,6 @@ def post_cast(body, user=None, enemy=None):
     else:
         user_u.level += bool(my_spell.score)
 
-    damage = my_spell.score + user_u.level * my_spell.score_level
     enemy_u.points -= int(damage * min(handicap_factor, 1))
     user_u.points -= my_spell.score_self
 
@@ -267,7 +274,6 @@ def post_cast(body, user=None, enemy=None):
             "title": msg,
             "type": "https://ioggstream.github.com/kids-potter/you-won",
         }
-    from jinja2 import Template
 
     if my_spell.type == "defence":
         msg = "Difesa riuscita!"

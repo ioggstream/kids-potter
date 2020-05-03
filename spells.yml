@@ -100,9 +100,18 @@ spells:
   risk: 0
   score: 0
   type: attack
-  time: 0  # ["spells"].keys()
+  time: 0
   msg: >-
-    {{game["spells"].keys()}}
+    Ecco tutti gli incantesimi: {{game["spells"].keys()}}
+- name: finite incantatem
+  risk: 0
+  score: 0
+  time: 0
+  reset_spell: true
+  type: attack
+  description: annulla l'incantesimo dell'avversario
+  msg: >-
+    Hai annullato l'incantesimo dell'avversario.
 - name: ta
   risk: 0
   score: 0
