@@ -2,7 +2,7 @@
 # Fields explanation:
 # - risk: this spell is risky and can backfire
 # - type: attack or defence
-# - score: this spell removes `score` points
+# - damage: this spell removes `score` points
 # - level: TBD you can use this spell only after x level
 spells:
 # First year
@@ -10,62 +10,62 @@ spells:
   description: >
     Questo incantesimo lancia una fiamma ed ha il 30% di possibilità di autoinfliggere il danno.
   risk: 30
-  score: 5
-  score_level: 1
-  time: 0
+  damage: 5
+  damage_per_level: 1
+  duration: 0
   type: attack
 - name: petrificus
   description: >
     l'avversario viene pietrificato: non può attaccare e riceve un danno.
   risk: 0
-  score: 5
-  time: 3
+  damage: 5
+  duration: 3
   type: attack
 - name: locomotor mortis
   description: >
     L'avversario è bloccato per 8 secondi
   risk: 0
-  score: 0
-  time: 8
+  damage: 0
+  duration: 8
   type: defence
 - name: wingardium leviosa
   description: >
     libra in aria l'avversario per 7 secondi e poi lo scaglia a terra. Finché è in
     aria non può attaccare. C'è il 20% di possibilità che ti si ritorca contro.
   risk: 20
-  score: 2
-  score_level: 2
-  time: 7
+  damage: 2
+  damage_per_level: 2
+  duration: 7
   type: attack
 - name: expecto patronum
   description: >
     Questo incantesimo protegge chi lo invoca fino al prossimo
     incantesimo per un massimo di 10 secondi
   risk: 0
-  score: 0
-  time: 10
+  damage: 0
+  duration: 10
   type: defence
   level: 2
 - name: expelliarmus
   description: >
     Disarma per 5 secondi il proprio avversario.
   risk: 0
-  score: 0
-  time: 5
+  damage: 0
+  duration: 5
   type: defence
   level: 2
 - name: vulnera sanentur
   description: >-
     Questo incantesimo guarisce le ferite.
-  score: 0
-  score_self: -10
+  damage: 0
+  damage_self: -10
   type: defence
   level: 2
 - name: bombarda
   description: >-
     Questo incantesimo colpisce sia il nemico che il giocatore.
-  score: 8
-  score_self: 4
+  damage: 8
+  damage_self: 4
   type: attack
   level: 3
 # curses
@@ -73,8 +73,8 @@ spells:
   description: >
     Il nemico soffre per 20 secondi.
   risk: 0
-  score: 10
-  time: 10
+  damage: 10
+  duration: 10
   type: attack
   level: 4
 - name: imperium
@@ -82,8 +82,8 @@ spells:
     Per 3 secondi tutti gli incatesimi del proprio avversario
     hanno il 50% di ritorcersi contro.
   risk: -50
-  score: 0
-  time: 3
+  damage: 0
+  duration: 3
   type: attack
   level: 4
 - name: avada kedavra
@@ -91,22 +91,22 @@ spells:
     Questo attacco ha il 20% di probabilità di ritorcersi
     contro chi lo invoca. Per invocarlo devi essere di livello 15.
   risk: 20
-  score: 25
-  time: 0
+  damage: 25
+  duration: 0
   type: attack
   on_insufficient_level: "L'incantesimo non ha funzionato...devi volerlo veramente!"
   level: 4
 - name: legilimens
   risk: 0
-  score: 0
+  damage: 0
   type: attack
-  time: 0
+  duration: 0
   msg: >-
     Ecco tutti gli incantesimi: {{game["spells"].keys()}}
 - name: finite incantatem
   risk: 0
-  score: 0
-  time: 0
+  damage: 0
+  duration: 0
   reset_spell: true
   type: attack
   description: annulla l'incantesimo dell'avversario
@@ -114,13 +114,13 @@ spells:
     Hai annullato l'incantesimo dell'avversario.
 - name: ta
   risk: 0
-  score: 0
-  time: 0
+  damage: 0
+  duration: 0
   type: attack
 - name: td
   risk: 0
-  score: 0
-  time: 0
+  damage: 0
+  duration: 0
   type: defence
 #Brackium Emendo
 #Legilimens

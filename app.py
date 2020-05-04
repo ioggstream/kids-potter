@@ -50,15 +50,15 @@ class User:
 class Spell:
     name: str
     type: str
-    score: int = 0
-    time: int = 0
+    damage: int = 0
+    duration: int = 0
     reset_spell: bool = False
     risk: int = 0
     description: str = None
     level: int = 0
     on_insufficient_level: str = "Non hai ancora imparato questo incantesimo!"
-    score_level: int = 0
-    score_self: int = 0
+    damage_per_level: int = 0
+    damage_self: int = 0
     msg: str = None
 
 
@@ -218,7 +218,7 @@ def post_cast(body, user=None, enemy=None):
 
     # Expire the enemy spell.
     log.warning("Enemy spell: %r cast %r", enemy_spell, now() - enemy_u.ts)
-    if now() - enemy_u.ts > enemy_spell.time if enemy_spell else 0:
+    if now() - enemy_u.ts > enemy_spell.duration if enemy_spell else 0:
         enemy_spell = None
 
     # Update user properties.
@@ -231,11 +231,14 @@ def post_cast(body, user=None, enemy=None):
         user_u.ts = now()
         user_u.status = my_spell.type
         user_u.power += len(my_spell.name)
+        #
+        # Reset spell invalidates enemy spell.
+        #
         if my_spell.reset_spell:
             enemy_u.last_spell_active = False
             enemy_spell = None
 
-    damage = my_spell.score + user_u.level * my_spell.score_level
+    damage = my_spell.damage + user_u.level * my_spell.damage_per_level
     # The spell backfires if misspelt or because of risk
     if misspelt == SPELL_KO or backfires(my_spell, enemy_spell):
         user_u.life_points -= damage
@@ -260,10 +263,10 @@ def post_cast(body, user=None, enemy=None):
         )
         log.warning("Reducing spell attack of %r", handicap_factor)
     else:
-        user_u.level += bool(my_spell.score)
+        user_u.level += bool(my_spell.damage)
 
     enemy_u.life_points -= int(damage * min(handicap_factor, 1))
-    user_u.life_points -= my_spell.score_self
+    user_u.life_points -= my_spell.damage_self
 
     if enemy_u.life_points <= 0:
         msg = "Hai vinto!"
